@@ -18,6 +18,7 @@ if ($argc != 4 ) {
 }
 
 $a = snmp2_walk($argv[1], $argv[2], $argv[3]);
+#  This is a debugging test to see if all is well ...
 #$a = array("OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionHighTemperature",
 #    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionCompressorHighHeadPressure",
 #    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionLocalAlarm1",
@@ -41,7 +42,6 @@ foreach ($a as $val) {
         exit(0);
     }  elseif (substr($val, 0, 32) === "OID: LIEBERT-GP-CONDITIONS-MIB::") {
         $alert = substr($val, 32);
-#             $alertprint = substr($val, 32).", ".$alertprint;
         $alertperf = substr($val, 32)."=1 ".$alertperf;
         $conditions = $conditions + 1;
         $flag = 0;
@@ -68,7 +68,6 @@ foreach ($a as $val) {
             case "lgpConditionCompressorLowPressure": $Clist = $alert." ".$Clist; $flag = 2; break;
             case "lgpConditionSystemControlBatteryLow": $Clist = $alert." ".$Clist; $flag = 2; break;
             case "lgpConditionEmergencyShutdown": $Clist = $alert." ".$Clist; $flag = 2; break;
-#				default:  $exitprint = "WARNING:"; $exitcode=1; break;  // no criticals found--must be warning
         }
         // if We found a critical alert, now set the exitcode and reset the flag
         if ($flag == 2) { $exitcode = 2; $flag = 0; }
