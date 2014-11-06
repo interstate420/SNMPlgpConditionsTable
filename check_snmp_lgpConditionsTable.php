@@ -17,12 +17,12 @@ if ($argc != 4 ) {
     exit(2);
 }
 
-$a = snmp2_walk($argv[1], $argv[2], $argv[3]);
 #  This is a debugging test to see if all is well ...
 #$a = array("OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionHighTemperature",
 #    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionCompressorHighHeadPressure",
 #    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionLocalAlarm1",
 #    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionWhatever");
+
 $alert = " ";
 $alertprint = " ";
 $alertperf = "";
@@ -34,6 +34,9 @@ $Wflag = 0;  // warning flag
 $flag = 0;
 $conditionspresent = "1.3.6.1.4.1.476.1.42.3.2.2.0"; // lgpConditionsPresent.0 OID
 $conditions = 0;
+
+#  OK, let's populate the $a array with the output from the Liebert HVAC snmpwalk
+$a = snmp2_walk($argv[1], $argv[2], $argv[3]);
 
 foreach ($a as $val) {
 
