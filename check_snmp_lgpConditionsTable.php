@@ -1,7 +1,7 @@
 #!/usr/bin/php -q
 <?php
 // check_snmp_lgpConditionsTable.php
-// Written by Tim Pratte <tim.pratte@secglobe.net>
+// Written by Tim Pratte 
 //
 // This nagios snmp2_walk scans the conditionally populated  LIEBERT-GP-CONDITIONS-MIB::lgpConditionsTable
 // for the output: "OID: LIEBERT-GP-CONDITIONS-MIB::" and prints the lgpConditionsWellKnown alert currently
@@ -9,7 +9,7 @@
 // list, go out as a WARNING, otherwise CRITICAL
 //
 //
-// (example:  ./check_snmp_lgpConditionsTable.php 172.25.75.103 public lgpConditionsTable)
+// (example:  ./check_snmp_lgpConditionsTable.php 192.168.1.2 public lgpConditionsTable)
 
 if ($argc != 4 ) {
     echo "USAGE:\r\n";
@@ -17,11 +17,11 @@ if ($argc != 4 ) {
     exit(2);
 }
 
-#$a = snmp2_walk($argv[1], $argv[2], $argv[3]);
-$a = array("OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionHighTemperature",
-    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionCompressorHighHeadPressure",
-    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionLocalAlarm1",
-    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionWhatever");
+$a = snmp2_walk($argv[1], $argv[2], $argv[3]);
+#$a = array("OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionHighTemperature",
+#    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionCompressorHighHeadPressure",
+#    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionLocalAlarm1",
+#    "OID: LIEBERT-GP-CONDITIONS-MIB::lgpConditionWhatever");
 $alert = " ";
 $alertprint = " ";
 $alertperf = "";
@@ -33,7 +33,6 @@ $Wflag = 0;  // warning flag
 $flag = 0;
 $conditionspresent = "1.3.6.1.4.1.476.1.42.3.2.2.0"; // lgpConditionsPresent.0 OID
 $conditions = 0;
-#$conditions = substr((snmpget($argv[1], $argv[2], $conditionspresent)), 9);
 
 foreach ($a as $val) {
 
@@ -50,7 +49,7 @@ foreach ($a as $val) {
         // If we already have a critical alert, don't reset it to warning
         if ($exitcode !== 2) { $exitprint = "WARNING:"; $exitcode = 1; }
 
-        switch ($alert) {
+        switch ($alert) {   // this is our critical list selected from the >128 lgpConditionsTable entries
             case (preg_match("/lgpConditionLocalAlarm.*/", $alert) ? true : false ): $Clist = $alert." ".$Clist; $flag = 2; break;
             case "lgpConditionHighHumidity": $Clist = $alert." ".$Clist; $flag = 2; break;
             case "lgpConditionLowHumidity": $Clist = $alert." ".$Clist; $flag = 2; break;
@@ -79,7 +78,7 @@ foreach ($a as $val) {
 
 }
 
-if ($Wflag == 1 && $exitcode == 1) {
+if ($Wflag == 1 && $exitcode == 1) {   // no critical matches, so just printout the warning list
     echo "WARNING: $Wlist|lpgConditionsTable_alerts=$conditions $alertperf\r\n"; exit($exitcode);
 }
 
